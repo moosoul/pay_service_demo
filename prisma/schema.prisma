@@ -15,13 +15,12 @@ datasource db {
 }
 
 model User {
-  id                   String                 @id @default(uuid())
-  name                 String /// 用户名
-  createdAt            DateTime               @default(now())
-  updatedAt            DateTime               @updatedAt
-  deletedAt            DateTime?
-  transactions         Transaction[]
-  ProductOnTransaction ProductOnTransaction[]
+  id           String        @id @default(uuid())
+  name         String /// 用户名
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  deletedAt    DateTime?
+  transactions Transaction[]
 
   @@map("users")
 }
@@ -142,10 +141,6 @@ model ProductOnTransaction {
   transaction   Transaction @relation(fields: [transactionId], references: [id])
   transactionId String
 
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
-
-  @@index([userId])
   @@index([productId])
   @@index([transactionId])
   @@map("product_on_transactions")

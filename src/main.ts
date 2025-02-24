@@ -42,7 +42,6 @@ async function bootstrap() {
     exclude: ['/openapi'],
   });
   const server = await app.listen(PORT || 3000);
-  console.log(server.address());
 
   console.log(
     `The Pay Service Server is running on port http://localhost:${PORT}`,
