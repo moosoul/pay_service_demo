@@ -63,6 +63,14 @@ npx prisma db seed
 npm run start:dev
 ```
 
+## API文档
+
+启动服务后，访问以下地址查看Swagger API文档：
+
+```
+http://localhost:3000/openapi
+```
+
 ## 测试
 
 ```bash
@@ -106,14 +114,6 @@ curl -X POST localhost:3001/api/topup/566d5fc8-fc78-48cd-9d7b-ed68a31f9820/refun
 2. 开发环境建议使用Stripe测试密钥
 3. 数据库迁移前请备份数据
 4. 测试时注意清理测试数据
-
-## API文档
-
-启动服务后，访问以下地址查看Swagger API文档：
-
-```
-http://localhost:3000/openapi
-```
 
 ## 常见问题
 
