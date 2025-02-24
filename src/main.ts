@@ -1,7 +1,7 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
-import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { HttpResponseInterceptor } from './interceptors/http-response.interceptor';
 import { HttpExceptionFilter } from './filters/http-exception.filter';
@@ -19,12 +19,7 @@ async function bootstrap() {
     }),
   );
 
-  app.useGlobalInterceptors(
-    new HttpResponseInterceptor(),
-    // new ClassSerializerInterceptor(app.get(Reflector), {
-    //   strategy: 'excludeAll',
-    // }),
-  );
+  app.useGlobalInterceptors(new HttpResponseInterceptor());
   app.useGlobalFilters(new HttpExceptionFilter());
 
   const config = new DocumentBuilder()

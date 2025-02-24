@@ -1,6 +1,5 @@
 import {
   Body,
-  ClassSerializerInterceptor,
   Controller,
   Get,
   Param,
@@ -89,6 +88,7 @@ export class TopupController {
   @ApiOperation({ summary: '充值 - 退款' })
   @ApiOkResponse({
     description: '成功',
+    type: createResponseType(String),
   })
   @ApiParam({
     name: 'id',
