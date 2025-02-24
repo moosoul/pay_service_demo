@@ -27,6 +27,7 @@ STRIPE_API_VERSION="2025-01-27.acacia;custom_checkout_beta=v1" # Stripe 版本, 
 ## Docker运行
 
 ```bash
+# 创建.env.docker文件, 并配置环境变量
 # 构建并启动所有服务
 docker-compose up -d # 会启动一个postgres数据库和redis, 如果和系统有冲突, 请自行修改docker-compose.yml以及.env文件对应的postgres和redis的配置
 ```
@@ -44,6 +45,8 @@ pnpm install
 ### 数据库初始化
 
 ```bash
+# 创建.env文件, 并配置环境变量
+
 # 运行数据库迁移
 npx prisma migrate deploy
 # 初始化基础数据
