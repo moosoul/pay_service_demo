@@ -13,7 +13,7 @@
 
 ```bash
 NODE_ENV=development # development, production
-DATABASE_URL="postgresql://postgres:postgres@host.docker.internal:5432/pay_service?schema=public"
+DATABASE_URL="postgresql://postgres:postgres@postgres:5432/pay_service?schema=public"
 PORT=3000 # 端口, 默认3000
 REDIS_URL="redis://redis:6379" # 缓存连接
 
