@@ -1,99 +1,132 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 项目运行文档
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## 环境要求
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+- Node.js >= 20
+- Docker & Docker Compose
+- PostgreSQL
+- Stripe 账号和API密钥
 
-## Description
+## 环境变量配置
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
+在项目根目录创建 `.env` 文件，配置以下环境变量：
 
 ```bash
-$ pnpm install
+NODE_ENV=development # development, production
+DATABASE_URL="postgresql://postgres:postgres@host.docker.internal:5432/pay_service?schema=public"
+PORT=3000 # 端口, 默认3000
+REDIS_URL="redis://redis:6379" # 缓存连接
+
+
+STRIPE_PUBLISHABLE_KEY="pk_test_51QvFOaPEmqbOLh0diAbNWgpffapp5tOte73b4lcaDa1rCLvBYQceRlIqUyb0qoMw7dwG7Q4j2MpJDt8p91jFDhvD003FTZe2dX"
+STRIPE_SECRET_KEY="sk_test_51QvFOaPEmqbOLh0daEojJzep8mIMQVBmvhS21t8i8XyyeesdtsqYxS9cpl2hBDueRK3ywIAylLG2AWjwUC68IR4i00nqt7QwKs" # Stripe 密钥
+STRIPE_WEBHOOK_SECRET="whsec_R0IB6ciQHg2AcShI7eYeKwecXiYTGB94" # Stripe 签名密钥
+STRIPE_API_VERSION="2025-01-27.acacia;custom_checkout_beta=v1" # Stripe 版本, 默认2025-01-27.acacia, 如需要启用ui_mode=custom需要指定为2025-01-27.acacia;custom_checkout_beta=v1
 ```
 
-## Compile and run the project
+## Docker运行
 
 ```bash
-# development
-$ pnpm run start
-
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+# 构建并启动所有服务
+docker-compose up -d # 会启动一个postgres数据库和redis, 如果和系统有冲突, 请自行修改docker-compose.yml以及.env文件对应的postgres和redis的配置
 ```
 
-## Run tests
+## 直接运行
+
+### 安装依赖
 
 ```bash
-# unit tests
-$ pnpm run test
-
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+# 安装项目依赖
+npm install -g pnpm
+pnpm install
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### 数据库初始化
 
 ```bash
-$ pnpm install -g mau
-$ mau deploy
+# 运行数据库迁移
+npx prisma migrate deploy
+# 初始化基础数据
+npx prisma db seed
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+基础数据包含：
 
-## Resources
+- 测试用户
+- 充值产品
+- 支持的货币
 
-Check out a few resources that may come in handy when working with NestJS:
+### 开发环境运行
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```bash
+# 启动开发服务器
+npm run start:dev
+```
 
-## Support
+## 测试
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```bash
+# 运行测试
+npm run test
+```
 
-## Stay in touch
+## 充值流程测试
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+**测试数据所在位置prisma/seed.json**
 
-## License
+1. 使用测试用户ID进行认证：
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+   - User1: `73687270-1b0b-400e-b0d3-6f6816c0e707`
+   - User2: `4bf83df0-21a4-41ff-a9f5-0bd3cee04b46`
+
+2. 可用的充值产品：
+
+   - Topup1000: `8e464e7e-90e5-494f-a3f0-410c341df0d6`
+   - Topup3000: `ebc49129-9075-4020-ac37-a87cda66918c`
+   - Topup9000: `43a77bfd-407a-4a64-94e7-0d9be3d41eda`
+
+3. 支持的货币：
+   - USD (默认)
+   - HKD
+   - CNY
+
+## 充值CURL测试例子
+
+```bash
+# 使用User1进行充值
+curl -X POST localhost:3000/api/topup -H "Content-Type: application/json" -H "Authorization: 73687270-1b0b-400e-b0d3-6f6816c0e707" -d '{"uiMode": "hosted", "callbackUrl": "http://localhost:3000", "cancelUrl": "http://localhost:3000", "products": [{"id": "8e464e7e-90e5-494f-a3f0-410c341df0d6", "quantity": 2}], "currencyCode": "CNY"}'
+
+# 使用User2进行退款
+curl -X POST localhost:3001/api/topup/566d5fc8-fc78-48cd-9d7b-ed68a31f9820/refund -H "Content-Type: application/json" -H "Authorization: 73687270-1b0b-400e-b0d3-6f6816c0e707" -d '{"amount": "100"}'
+```
+
+## 注意事项
+
+1. 确保Stripe Webhook配置正确，用于接收支付状态回调
+2. 开发环境建议使用Stripe测试密钥
+3. 数据库迁移前请备份数据
+4. 测试时注意清理测试数据
+
+## API文档
+
+启动服务后，访问以下地址查看Swagger API文档：
+
+```
+http://localhost:3000/openapi
+```
+
+## 常见问题
+
+1. 数据库连接失败
+
+   - 检查数据库服务是否运行
+   - 验证数据库连接字符串是否正确
+
+2. Stripe支付失败
+
+   - 确认API密钥是否正确
+   - 检查产品价格是否符合Stripe要求
+
+3. 测试失败
+   - 确保测试数据库配置正确
+   - 检查测试环境变量是否正确设置

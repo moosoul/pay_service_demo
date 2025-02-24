@@ -1,6 +1,7 @@
 import {
   BadGatewayException,
   BadRequestException,
+  ForbiddenException,
   Inject,
   Injectable,
   NotFoundException,
@@ -210,10 +211,16 @@ export class TopupService {
             product: true,
           },
         },
+        userId: true,
       },
     });
     if (!transaction) {
       throw new NotFoundException(`Transaction id = ${id} not found`);
+    }
+    if (transaction.userId !== this.request.user.id) {
+      throw new ForbiddenException(
+        'You are not allowed to access this transaction',
+      );
     }
 
     return new TransactionEntity(transaction);
@@ -227,10 +234,17 @@ export class TopupService {
       select: {
         id: true,
         status: true,
+        userId: true,
       },
     });
     if (!transaction) {
       throw new NotFoundException(`Transaction id = ${id} not found`);
+    }
+
+    if (transaction.userId !== this.request.user.id) {
+      throw new ForbiddenException(
+        'You are not allowed to access this transaction',
+      );
     }
 
     // TODO: 手动查询一次stripe的api
@@ -239,8 +253,6 @@ export class TopupService {
   }
 
   async refund(id: string, dto: CreateRefundDto) {
-    console.log(dto);
-
     const transaction = await this.prisma.transaction.findUnique({
       where: {
         id,
@@ -248,6 +260,11 @@ export class TopupService {
     });
     if (!transaction) {
       throw new NotFoundException(`Transaction id = ${id} not found`);
+    }
+    if (transaction.userId !== this.request.user.id) {
+      throw new ForbiddenException(
+        'You are not allowed to access this transaction',
+      );
     }
 
     if (
