@@ -1,0 +1,52 @@
+{
+  "products": [
+    {
+      "id": "8e464e7e-90e5-494f-a3f0-410c341df0d6",
+      "name": "Topup1000",
+      "amount": 1000,
+      "currencyCode": "USD"
+    },
+    {
+      "id": "ebc49129-9075-4020-ac37-a87cda66918c",
+      "name": "Topup3000",
+      "amount": 3000,
+      "currencyCode": "USD"
+    },
+    {
+      "id": "43a77bfd-407a-4a64-94e7-0d9be3d41eda",
+      "name": "Topup9000",
+      "amount": 9000,
+      "currencyCode": "USD"
+    }
+  ],
+  "users": [
+    {
+      "id": "73687270-1b0b-400e-b0d3-6f6816c0e707",
+      "name": "User1"
+    },
+    {
+      "id": "4bf83df0-21a4-41ff-a9f5-0bd3cee04b46",
+      "name": "User2"
+    }
+  ],
+  "currencies": [
+    {
+      "id": "1",
+      "name": "USD",
+      "symbol": "$",
+      "code": "USD"
+    },
+    {
+      "id": "2",
+      "name": "HKD",
+      "symbol": "HK$",
+      "code": "HKD"
+    },
+    {
+      "id": "3",
+      "name": "CNY",
+      "symbol": "¥",
+      "code": "CNY"
+    }
+  ]
+}

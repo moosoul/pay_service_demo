@@ -1,0 +1,198 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "postgresql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model User {
+  id           String        @id @default(uuid())
+  name         String /// 用户名
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  deletedAt    DateTime?
+  transactions Transaction[]
+
+  @@map("users")
+}
+
+/// 交易状态
+enum TransactionStatus {
+  pending /// 待支付
+  succeeded /// 已完成
+  failed /// 失败
+  expired /// 已过期
+
+  /// 退款状态
+  refund_partial_pending /// 部分退款中
+  refund_partial_failed /// 部分退款失败
+  refund_partial_succeeded /// 部分退款成功
+  refund_pending /// 退款中
+  refund_failed /// 退款失败
+  refund_succeeded /// 已退款
+}
+
+/// 交易
+model Transaction {
+  id String @id @default(uuid())
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  no String @unique /// 交易订单号
+
+  amount   Int /// 交易金额
+  currency String /// 交易货币
+
+  refundedAmount Int? /// 退款金额
+
+  expiredAt DateTime /// 交易过期时间
+  status    TransactionStatus /// 交易状态
+
+  failedReason String? /// 失败原因
+  refundReason String? /// 退款原因
+
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @default(now()) @updatedAt
+  deletedAt             DateTime?
+  productOnTransactions ProductOnTransaction[]
+  transactionRecords    TransactionRecord[]
+
+  stripePaymentDatas  StripePaymentData[]
+  stripeWebhookEvents StripeWebhookEvent[]
+  stripePaymentStatus String?
+  TransactionRefund   TransactionRefund[]
+
+  @@index([userId])
+  @@index([status])
+  @@map("transactions")
+}
+
+enum TransactionRefundStatus {
+  pending /// 退款中
+  failed /// 退款失败
+  succeeded /// 已退款
+}
+
+model TransactionRefund {
+  id String @id @default(uuid())
+
+  currency String /// 退款货币
+  amount   Int /// 退款金额
+  reason   String? /// 退款原因
+
+  status TransactionRefundStatus @default(pending) /// 退款状态
+
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
+  transactionId String
+
+  @@index([transactionId])
+  @@map("transaction_refunds")
+}
+
+/// 交易记录
+model TransactionRecord {
+  id String @id @default(uuid())
+
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
+  transactionId String
+
+  source Json /// 源数据
+  target Json /// 修改后数据
+
+  @@index([transactionId])
+  @@map("transaction_records")
+}
+
+/// 商品
+model Product {
+  id                    String                 @id @default(uuid())
+  name                  String
+  amount                Int /// 价格，单位为分
+  currencyCode          String /// 货币代码
+  currency              Currency               @relation(fields: [currencyCode], references: [code])
+  productOnTransactions ProductOnTransaction[]
+
+  @@index([currencyCode])
+  @@map("products")
+}
+
+model ProductOnTransaction {
+  id String @id @default(uuid())
+
+  productAmount   Int /// 支付时商品价格
+  productCurrency String /// 支付时商品货币
+  productQuantity Int /// 支付时商品数量
+  rate            Float /// 汇率
+
+  product         Product @relation(fields: [productId], references: [id])
+  productId       String
+  productMetadata Json? /// 支付时商品元数据
+
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
+  transactionId String
+
+  @@index([productId])
+  @@index([transactionId])
+  @@map("product_on_transactions")
+}
+
+/// 货币
+model Currency {
+  code     String    @id
+  symbol   String
+  name     String
+  products Product[]
+
+  @@map("currencies")
+}
+
+enum StripePaymentDataType {
+  checkout_session /// 支付会话
+  payment_intent /// 支付意向
+  charge /// 扣款
+  refund /// 退款
+}
+
+model StripePaymentData {
+  id   String
+  type StripePaymentDataType
+
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
+  transactionId String
+
+  requestMetadata  Json? /// 请求元数据
+  responseMetadata Json? /// 响应元数据
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+  @@id([id, type])
+  @@index([transactionId])
+  @@map("stripe_payment_datas")
+}
+
+model StripeWebhookEvent {
+  id   String
+  type String
+
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
+  transactionId String
+
+  created Int /// 请求的创建时间
+
+  metadata Json /// 元数据
+
+  @@id([id, type])
+  @@index([transactionId])
+  @@map("stripe_webhook_events")
+}

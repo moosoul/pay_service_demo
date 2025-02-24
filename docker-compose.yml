@@ -1,0 +1,32 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    ports:
+      - '3000:3000'
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/pay_service?schema=public
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+  postgres:
+    image: postgres:17.2-alpine
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: postgres # 数据库密码
+      POSTGRES_USER: postgres # 数据库用户名
+      POSTGRES_DB: pay_service # 默认数据库名
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./data:/var/lib/postgresql/data # 数据持久化
+  redis:
+    image: redis:7.4.1-alpine
+    container_name: redis7.4.1
+    restart: always
+    ports:
+      - '6379:6379'
+volumes:
+  postgres_data:
