@@ -67,7 +67,7 @@ model Transaction {
   stripePaymentDatas  StripePaymentData[]
   stripeWebhookEvents StripeWebhookEvent[]
   stripePaymentStatus String?
-  TransactionRefund   TransactionRefund[]
+  transactionRefunds  TransactionRefund[]
 
   @@index([userId])
   @@index([status])
