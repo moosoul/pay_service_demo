@@ -48,19 +48,16 @@ model Transaction {
   user   User   @relation(fields: [userId], references: [id])
   userId String
 
-  no String @unique /// 交易订单号
-
-  amount   Int /// 交易金额
-  currency String /// 交易货币
-
-  refundedAmount Int? /// 退款金额
-
-  expiredAt DateTime /// 交易过期时间
-  status    TransactionStatus /// 交易状态
+  no             String            @unique /// 交易订单号
+  currency       String /// 交易货币
+  amount         Int /// 交易金额
+  refundedAmount Int               @default(0) /// 退款金额
+  status         TransactionStatus @default(pending) /// 交易状态
 
   failedReason String? /// 失败原因
   refundReason String? /// 退款原因
 
+  expiredAt             DateTime /// 交易过期时间
   createdAt             DateTime               @default(now())
   updatedAt             DateTime               @default(now()) @updatedAt
   deletedAt             DateTime?

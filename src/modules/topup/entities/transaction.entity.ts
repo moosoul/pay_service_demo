@@ -1,6 +1,7 @@
 import { $Enums, Transaction } from '@prisma/client';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { JsonValue } from '@prisma/client/runtime/library';
+import { ProductEntity } from './product.entity';
 
 export class TransactionEntity implements Transaction {
   constructor(partial?: Partial<TransactionEntity>) {
@@ -86,4 +87,9 @@ export class TransactionEntity implements Transaction {
     description: 'Stripe支付状态, 可参考webhook对应的事件',
   })
   stripePaymentStatus: string;
+
+  @ApiProperty({
+    description: '产品列表',
+  })
+  products: ProductEntity[];
 }

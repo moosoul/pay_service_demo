@@ -5,6 +5,7 @@ export class TransactionStatusEntity extends PickType(TransactionEntity, [
   'id',
   'no',
   'status',
+  'stripePaymentStatus',
 ]) {
   constructor(partial: Partial<TransactionStatusEntity>) {
     super();

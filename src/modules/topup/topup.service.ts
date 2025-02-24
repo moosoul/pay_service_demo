@@ -202,8 +202,13 @@ export class TopupService {
         id: true,
         no: true,
         amount: true,
+        refundedAmount: true,
         currency: true,
         status: true,
+        stripePaymentStatus: true,
+        failedReason: true,
+        refundReason: true,
+        expiredAt: true,
         createdAt: true,
         updatedAt: true,
         productOnTransactions: {
@@ -223,7 +228,14 @@ export class TopupService {
       );
     }
 
-    return new TransactionEntity(transaction);
+    const products = transaction.productOnTransactions.map(
+      (item) => item.product,
+    );
+    delete transaction.productOnTransactions;
+    return new TransactionEntity({
+      ...transaction,
+      products,
+    });
   }
 
   async findOneStatus(id: string) {
@@ -234,6 +246,7 @@ export class TopupService {
       select: {
         id: true,
         status: true,
+        stripePaymentStatus: true,
         userId: true,
       },
     });
